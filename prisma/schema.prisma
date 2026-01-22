@@ -1,0 +1,169 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+enum MembershipRole {
+  owner
+  admin
+  advisor
+  operator
+  viewer
+}
+
+enum GrazingEventStatus {
+  planned
+  active
+  closed
+}
+
+model Organization {
+  id         String      @id @default(uuid()) @db.Uuid
+  name       String
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  deletedAt  DateTime?   @map("deleted_at")
+
+  memberships Membership[]
+  farms       Farm[]
+
+  @@map("organizations")
+}
+
+model User {
+  id               String      @id @default(uuid()) @db.Uuid
+  email            String      @unique
+  fullName         String?     @map("full_name")
+
+  passwordHash     String      @map("password_hash")
+  refreshTokenHash String?     @map("refresh_token_hash")
+
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
+  deletedAt        DateTime?   @map("deleted_at")
+
+  memberships      Membership[]
+
+  @@map("users")
+}
+
+
+model Membership {
+  id              String         @id @default(uuid()) @db.Uuid
+  organizationId  String         @db.Uuid @map("organization_id")
+  userId          String         @db.Uuid @map("user_id")
+  role            MembershipRole @default(viewer)
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  deletedAt       DateTime?      @map("deleted_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId], map: "memberships_org_user_unique")
+  @@index([organizationId], map: "memberships_org_idx")
+  @@index([userId], map: "memberships_user_idx")
+  @@map("memberships")
+}
+
+model Farm {
+  id              String    @id @default(uuid()) @db.Uuid
+  organizationId  String    @db.Uuid @map("organization_id")
+  name            String
+  // PostGIS Point: geometry(Point, 4326)
+  center          Unsupported("geometry")?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  paddocks      Paddock[]
+  waterPoints   WaterPoint[]
+  herdGroups    HerdGroup[]
+  grazingEvents GrazingEvent[]
+
+  @@index([organizationId], map: "farms_org_idx")
+  @@map("farms")
+}
+
+model Paddock {
+  id         String    @id @default(uuid()) @db.Uuid
+  farmId     String    @db.Uuid @map("farm_id")
+  name       String
+  // PostGIS Polygon: geometry(Polygon, 4326)
+  polygon    Unsupported("geometry")
+  areaHa     Decimal? @map("area_ha")
+  isActive   Boolean   @default(true) @map("is_active")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
+
+  farm        Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  grazingEvents GrazingEvent[]
+
+  @@index([farmId], map: "paddocks_farm_idx")
+  @@map("paddocks")
+}
+
+model WaterPoint {
+  id         String    @id @default(uuid()) @db.Uuid
+  farmId     String    @db.Uuid @map("farm_id")
+  name       String?
+  type       String?
+  // PostGIS Point: geometry(Point, 4326)
+  location   Unsupported("geometry")
+  isActive   Boolean   @default(true) @map("is_active")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
+
+  farm Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+
+  @@index([farmId], map: "water_points_farm_idx")
+  @@map("water_points")
+}
+
+model HerdGroup {
+  id         String    @id @default(uuid()) @db.Uuid
+  farmId     String    @db.Uuid @map("farm_id")
+  name       String
+  category   String?
+  headcount  Int?
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
+
+  farm         Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  grazingEvents GrazingEvent[]
+
+  @@index([farmId], map: "herd_groups_farm_idx")
+  @@map("herd_groups")
+}
+
+model GrazingEvent {
+  id          String            @id @default(uuid()) @db.Uuid
+  farmId      String            @db.Uuid @map("farm_id")
+  herdGroupId String            @db.Uuid @map("herd_group_id")
+  paddockId   String            @db.Uuid @map("paddock_id")
+  status      GrazingEventStatus @default(planned)
+  startAt     DateTime          @map("start_at")
+  endAt       DateTime?         @map("end_at")
+  notes       String?
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+  deletedAt   DateTime?         @map("deleted_at")
+
+  farm      Farm      @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  herdGroup HerdGroup @relation(fields: [herdGroupId], references: [id], onDelete: Cascade)
+  paddock   Paddock   @relation(fields: [paddockId], references: [id], onDelete: Restrict)
+
+  @@index([farmId], map: "grazing_events_farm_idx")
+  @@index([herdGroupId], map: "grazing_events_herd_idx")
+  @@index([paddockId], map: "grazing_events_paddock_idx")
+  @@index([startAt], map: "grazing_events_start_at_idx")
+  @@map("grazing_events")
+}
