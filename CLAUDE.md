@@ -78,6 +78,7 @@ src/modules/<module-name>/
 ### Key Architectural Patterns
 
 1. **Dependency Inversion**: Domain layer defines repository interfaces; infrastructure layer implements them. Modules use dependency injection to bind interfaces to implementations:
+
    ```typescript
    { provide: UserRepository, useClass: PrismaUserRepository }
    ```
@@ -103,6 +104,7 @@ src/modules/<module-name>/
 ### Multi-tenancy
 
 The system uses organization-based multi-tenancy:
+
 - Users belong to organizations through `Membership` model
 - Memberships have roles: `owner`, `admin`, `advisor`, `operator`, `viewer`
 - Each farm belongs to an organization
@@ -111,6 +113,7 @@ The system uses organization-based multi-tenancy:
 ### Geospatial Data
 
 The project uses PostGIS for spatial data:
+
 - Farm centers: `geometry(Point, 4326)`
 - Paddock polygons: `geometry(Polygon, 4326)`
 - Water point locations: `geometry(Point, 4326)`
@@ -124,6 +127,7 @@ API documentation is auto-generated and available at `/docs` when the server is 
 ## Environment Variables
 
 Required environment variables (see `.env`):
+
 - `DATABASE_URL`: PostgreSQL connection string
 - `PORT`: Server port (defaults to 3000)
 - `JWT_ACCESS_SECRET`: Secret for access token signing
@@ -147,6 +151,7 @@ Required environment variables (see `.env`):
 ### Validation
 
 DTOs use `class-validator` and `class-transformer`:
+
 - Global `ValidationPipe` is configured with `whitelist: true` and `transform: true`
 - Always define DTOs with proper decorators (`@IsString()`, `@IsEmail()`, etc.)
 - The pipeline automatically strips unknown properties and transforms types
@@ -154,6 +159,7 @@ DTOs use `class-validator` and `class-transformer`:
 ### Error Handling
 
 Use NestJS built-in HTTP exceptions:
+
 - `NotFoundException` for missing resources
 - `UnauthorizedException` for auth failures
 - `ForbiddenException` for permission issues
@@ -164,25 +170,34 @@ Use NestJS built-in HTTP exceptions:
 **IMPORTANT**: These are recurring errors that MUST be avoided when creating new modules:
 
 ### 1. PrismaService Import Path
+
 **❌ WRONG:**
+
 ```typescript
 import { PrismaService } from '../../../../prisma/prisma.service';
 ```
 
 **✅ CORRECT:**
+
 ```typescript
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
 ```
 
 **Rule**: ALWAYS use `'prisma/prisma.service'` (no relative path) because PrismaModule is global.
 
 ### 2. JwtUser Type Import
+
 **❌ WRONG:**
+
 ```typescript
-import { CurrentUser, JwtUser } from '../../../common/decorators/current-user.decorator';
+import {
+  CurrentUser,
+  JwtUser,
+} from '../../../common/decorators/current-user.decorator';
 ```
 
 **✅ CORRECT:**
+
 ```typescript
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import type { JwtUser } from '../../../common/decorators/current-user.decorator';
@@ -191,7 +206,9 @@ import type { JwtUser } from '../../../common/decorators/current-user.decorator'
 **Rule**: `JwtUser` is a TYPE, not a class. It must be imported with `import type` to avoid `isolatedModules` errors with `emitDecoratorMetadata`.
 
 ### 3. Use Case File Structure
+
 **Rule**: Every use case must:
+
 - Import `PrismaService` correctly (see #1)
 - Validate farm ownership before operations:
   ```typescript
@@ -205,7 +222,9 @@ import type { JwtUser } from '../../../common/decorators/current-user.decorator'
 - Delegate actual DB operations to the repository
 
 ### 4. Controller Patterns
+
 **Rule**: Controllers must:
+
 - Import `JwtUser` as a type (see #2)
 - Use `@CurrentUser() user: JwtUser` to get authenticated user
 - Pass `user.orgId!` to use cases for authorization
