@@ -183,7 +183,7 @@ import { PrismaService } from '../../../../prisma/prisma.service';
 import { PrismaService } from '@prisma/prisma.service';
 ```
 
-**Rule**: ALWAYS use `'prisma/prisma.service'` (no relative path) because PrismaModule is global.
+**Rule**: ALWAYS use `@prisma/prisma.service` (path alias, NOT relative path) because PrismaModule is global. The project uses `module-alias` to resolve `@prisma/*` paths at runtime.
 
 ### 2. JwtUser Type Import
 
