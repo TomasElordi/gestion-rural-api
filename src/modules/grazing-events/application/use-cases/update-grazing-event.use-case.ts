@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
+
 import { GrazingEventRepository } from '../../domain/repositories/grazing-event.repository';
 import { UpdateGrazingEventDto } from '../../presentation/dto/update-grazing-event.dto';
 import { GrazingEventResponseDto } from '../../presentation/dto/grazing-event-response.dto';
@@ -40,7 +41,9 @@ export class UpdateGrazingEventUseCase {
     }
 
     // 3. Validate date consistency if dates are being updated
-    const newStartAt = dto.startAt ? new Date(dto.startAt) : currentEvent.startAt;
+    const newStartAt = dto.startAt
+      ? new Date(dto.startAt)
+      : currentEvent.startAt;
     const newEndAt = dto.endAt ? new Date(dto.endAt) : currentEvent.endAt;
 
     if (newEndAt) {

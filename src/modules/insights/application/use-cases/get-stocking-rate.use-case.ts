@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
+
 import { InsightsRepository } from '../../domain/repositories/insights.repository';
 import {
   StockingRateEventDto,

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
+
 import { GrazingEventRepository } from '../../domain/repositories/grazing-event.repository';
 import { GrazingEventResponseDto } from '../../presentation/dto/grazing-event-response.dto';
 import { QueryGrazingEventsDto } from '../../presentation/dto/query-grazing-events.dto';

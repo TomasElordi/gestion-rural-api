@@ -1,11 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
+
 import { InsightsRepository } from '../../domain/repositories/insights.repository';
-import {
-  TimelineEventDto,
-  TimelineResponseDto,
-} from '../../presentation/dto';
+import { TimelineEventDto, TimelineResponseDto } from '../../presentation/dto';
 
 @Injectable()
 export class GetTimelineUseCase {
@@ -22,9 +20,8 @@ export class GetTimelineUseCase {
       3,
     );
 
-    const stockingThreshold = this.configService.get<number>(
-      'PRV_MAX_UGM_PER_HA',
-    );
+    const stockingThreshold =
+      this.configService.get<number>('PRV_MAX_UGM_PER_HA');
     this.stockingRateThresholdUgmPerHa =
       stockingThreshold !== undefined ? stockingThreshold : null;
   }
@@ -64,7 +61,9 @@ export class GetTimelineUseCase {
       const endAt = data.endAt ?? now;
       const durationMs = endAt.getTime() - startAt.getTime();
       const occupancyHours = Math.floor(durationMs / (1000 * 60 * 60));
-      const occupancyDays = Number((durationMs / (1000 * 60 * 60 * 24)).toFixed(2));
+      const occupancyDays = Number(
+        (durationMs / (1000 * 60 * 60 * 24)).toFixed(2),
+      );
 
       // Calculate stocking rate
       const eventUgm = data.ugmSnapshot ?? data.herdGroupCurrentUgm;

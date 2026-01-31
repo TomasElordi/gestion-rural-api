@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
+
 import { InsightsRepository } from '../../domain/repositories/insights.repository';
 import {
   ActiveAlertEventDto,
@@ -47,7 +48,9 @@ export class GetActiveAlertsUseCase {
       const startAt = data.startAt;
       const durationMs = now.getTime() - startAt.getTime();
       const occupancyHours = Math.floor(durationMs / (1000 * 60 * 60));
-      const occupancyDays = Number((durationMs / (1000 * 60 * 60 * 24)).toFixed(2));
+      const occupancyDays = Number(
+        (durationMs / (1000 * 60 * 60 * 24)).toFixed(2),
+      );
 
       return {
         id: data.eventId,

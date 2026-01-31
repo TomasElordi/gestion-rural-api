@@ -3,7 +3,8 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
+
 import { PaddockRepository } from '../../domain/repositories/paddock.repository';
 import { CreatePaddockDto } from '../../presentation/dto/create-paddock.dto';
 import { UpdatePaddockDto } from '../../presentation/dto/update-paddock.dto';

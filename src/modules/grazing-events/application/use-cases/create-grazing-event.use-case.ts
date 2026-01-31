@@ -1,5 +1,10 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
+import { PrismaService } from '@prisma/prisma.service';
+
 import { GrazingEventRepository } from '../../domain/repositories/grazing-event.repository';
 import { CreateGrazingEventDto } from '../../presentation/dto/create-grazing-event.dto';
 import { GrazingEventResponseDto } from '../../presentation/dto/grazing-event-response.dto';
@@ -42,7 +47,9 @@ export class CreateGrazingEventUseCase {
     });
 
     if (!paddock) {
-      throw new BadRequestException('Paddock not found or does not belong to this farm');
+      throw new BadRequestException(
+        'Paddock not found or does not belong to this farm',
+      );
     }
 
     // 3. Validate that herd group exists and belongs to the farm
@@ -55,7 +62,9 @@ export class CreateGrazingEventUseCase {
     });
 
     if (!herdGroup) {
-      throw new BadRequestException('Herd group not found or does not belong to this farm');
+      throw new BadRequestException(
+        'Herd group not found or does not belong to this farm',
+      );
     }
 
     // 4. Validate date consistency
@@ -67,7 +76,10 @@ export class CreateGrazingEventUseCase {
     }
 
     // 5. Determine initial status based on dates
-    const status = this.rulesService.determineInitialStatus(dto.startAt, dto.endAt);
+    const status = this.rulesService.determineInitialStatus(
+      dto.startAt,
+      dto.endAt,
+    );
 
     // 6. If status is active, validate that resources are available
     if (status === GrazingEventStatus.ACTIVE) {
@@ -79,11 +91,6 @@ export class CreateGrazingEventUseCase {
     const ugmSnapshot = herdGroup.ugm ? herdGroup.ugm.toNumber() : null;
 
     // 8. Create the grazing event
-    return this.grazingEventRepository.create(
-      farmId,
-      dto,
-      status,
-      ugmSnapshot,
-    );
+    return this.grazingEventRepository.create(farmId, dto, status, ugmSnapshot);
   }
 }

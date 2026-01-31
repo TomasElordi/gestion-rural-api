@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
+
 import { PaddockRepository } from '../../../paddocks/domain/repositories/paddock.repository';
 import { WaterPointRepository } from '../../../water-points/domain/repositories/water-point.repository';
 import { HerdGroupRepository } from '../../../herd-groups/domain/repositories/herd-group.repository';

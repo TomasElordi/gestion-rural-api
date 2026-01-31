@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PaddockRepository } from '../../domain/repositories/paddock.repository';
 import { CreatePaddockDto } from '../../presentation/dto/create-paddock.dto';
 import { PaddockResponseDto } from '../../presentation/dto/paddock-response.dto';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
 
 @Injectable()
 export class CreatePaddockUseCase {

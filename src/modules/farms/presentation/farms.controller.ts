@@ -11,7 +11,7 @@ import { CreateFarmUseCase } from '../application/use-cases/create-farm.usecase'
 import { ListFarmsUseCase } from '../application/use-cases/list-farms.usecase';
 import { GetFarmUseCase } from '../application/use-cases/get-farm.usecase';
 import { GetFarmMapLayersUseCase } from '../application/use-cases/get-farm-map-layers.usecase';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
 
 @ApiTags('Farms')
 @ApiBearerAuth('access-token')

@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
+
 import { InsightsRepository } from '../../domain/repositories/insights.repository';
 import {
   PaddockRestDaysDto,
@@ -30,9 +31,8 @@ export class GetRestDaysUseCase {
       throw new NotFoundException('Farm not found or access denied');
     }
 
-    const paddocksData = await this.insightsRepository.getPaddocksRestDays(
-      farmId,
-    );
+    const paddocksData =
+      await this.insightsRepository.getPaddocksRestDays(farmId);
 
     const now = new Date();
     const paddocks: PaddockRestDaysDto[] = paddocksData.map((data) => {

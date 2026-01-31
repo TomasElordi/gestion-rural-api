@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
+
 import { PaddockRepository } from '../../domain/repositories/paddock.repository';
 import { PaddockResponseDto } from '../../presentation/dto/paddock-response.dto';
 

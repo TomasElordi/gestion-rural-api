@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
+
 import { WaterPointRepository } from '../../domain/repositories/water-point.repository';
 import { UpdateWaterPointDto } from '../../presentation/dto/update-water-point.dto';
 import { WaterPointResponseDto } from '../../presentation/dto/water-point-response.dto';

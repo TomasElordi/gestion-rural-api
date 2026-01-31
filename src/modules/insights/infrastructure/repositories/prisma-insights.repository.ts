@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
+
 import {
   InsightsRepository,
   OccupancyEventData,
@@ -45,8 +46,7 @@ export class PrismaInsightsRepository implements InsightsRepository {
       paddockId: paddock.id,
       paddockName: paddock.name,
       areaHa: paddock.areaHa ? Number(paddock.areaHa) : 0,
-      lastGrazingEndDate:
-        paddock.grazingEvents[0]?.endAt ?? null,
+      lastGrazingEndDate: paddock.grazingEvents[0]?.endAt ?? null,
     }));
   }
 
@@ -79,10 +79,7 @@ export class PrismaInsightsRepository implements InsightsRepository {
         );
       } else if (from) {
         // Events that end after 'from' or are still active
-        whereClause.OR.push(
-          { endAt: { gte: from } },
-          { endAt: null },
-        );
+        whereClause.OR.push({ endAt: { gte: from } }, { endAt: null });
       } else if (to) {
         // Events that start before 'to'
         whereClause.startAt = { lte: to };
@@ -147,10 +144,7 @@ export class PrismaInsightsRepository implements InsightsRepository {
           { startAt: { lte: to }, endAt: null },
         );
       } else if (from) {
-        whereClause.OR.push(
-          { endAt: { gte: from } },
-          { endAt: null },
-        );
+        whereClause.OR.push({ endAt: { gte: from } }, { endAt: null });
       } else if (to) {
         whereClause.startAt = { lte: to };
       }

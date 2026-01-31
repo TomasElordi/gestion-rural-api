@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
+
 import { HerdGroupRepository } from '../../domain/repositories/herd-group.repository';
 import { CreateHerdGroupDto } from '../../presentation/dto/create-herd-group.dto';
 import { HerdGroupResponseDto } from '../../presentation/dto/herd-group-response.dto';

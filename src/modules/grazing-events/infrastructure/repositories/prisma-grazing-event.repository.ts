@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
+import { PrismaService } from '@prisma/prisma.service';
+
 import { Decimal } from '@prisma/client/runtime/client';
 import { GrazingEventRepository } from '../../domain/repositories/grazing-event.repository';
 import { CreateGrazingEventDto } from '../../presentation/dto/create-grazing-event.dto';
@@ -80,7 +81,9 @@ export class PrismaGrazingEventRepository extends GrazingEventRepository {
       },
     });
 
-    return grazingEvent ? GrazingEventResponseDto.fromPrisma(grazingEvent) : null;
+    return grazingEvent
+      ? GrazingEventResponseDto.fromPrisma(grazingEvent)
+      : null;
   }
 
   async update(
