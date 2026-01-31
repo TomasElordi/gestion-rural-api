@@ -4,6 +4,11 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
+// Configurar Node.js para aceptar certificados autofirmados en Supabase
+if (process.env.DATABASE_URL?.includes('supabase.com')) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
