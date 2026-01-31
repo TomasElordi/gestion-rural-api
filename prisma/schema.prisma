@@ -18,7 +18,8 @@ enum MembershipRole {
 enum GrazingEventStatus {
   planned
   active
-  closed
+  done
+  canceled
 }
 
 model Organization {
@@ -91,16 +92,17 @@ model Farm {
 }
 
 model Paddock {
-  id         String    @id @default(uuid()) @db.Uuid
-  farmId     String    @db.Uuid @map("farm_id")
-  name       String
+  id          String    @id @default(uuid()) @db.Uuid
+  farmId      String    @db.Uuid @map("farm_id")
+  name        String
+  description String?
   // PostGIS Polygon: geometry(Polygon, 4326)
-  polygon    Unsupported("geometry")
-  areaHa     Decimal? @map("area_ha")
-  isActive   Boolean   @default(true) @map("is_active")
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
-  deletedAt  DateTime? @map("deleted_at")
+  polygon     Unsupported("geometry")
+  areaHa      Decimal? @map("area_ha")
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
 
   farm        Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
   grazingEvents GrazingEvent[]
@@ -128,16 +130,19 @@ model WaterPoint {
 }
 
 model HerdGroup {
-  id         String    @id @default(uuid()) @db.Uuid
-  farmId     String    @db.Uuid @map("farm_id")
-  name       String
-  category   String?
-  headcount  Int?
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
-  deletedAt  DateTime? @map("deleted_at")
+  id            String    @id @default(uuid()) @db.Uuid
+  farmId        String    @db.Uuid @map("farm_id")
+  name          String
+  category      String?
+  liveWeightKg  Decimal   @map("live_weight_kg") @db.Decimal(10, 2)
+  ugm           Decimal   @db.Decimal(10, 4)
+  headCount     Int?      @map("head_count")
+  notes         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  deletedAt     DateTime? @map("deleted_at")
 
-  farm         Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
+  farm          Farm @relation(fields: [farmId], references: [id], onDelete: Cascade)
   grazingEvents GrazingEvent[]
 
   @@index([farmId], map: "herd_groups_farm_idx")
@@ -145,17 +150,18 @@ model HerdGroup {
 }
 
 model GrazingEvent {
-  id          String            @id @default(uuid()) @db.Uuid
-  farmId      String            @db.Uuid @map("farm_id")
-  herdGroupId String            @db.Uuid @map("herd_group_id")
-  paddockId   String            @db.Uuid @map("paddock_id")
+  id          String             @id @default(uuid()) @db.Uuid
+  farmId      String             @db.Uuid @map("farm_id")
+  herdGroupId String             @db.Uuid @map("herd_group_id")
+  paddockId   String             @db.Uuid @map("paddock_id")
   status      GrazingEventStatus @default(planned)
-  startAt     DateTime          @map("start_at")
-  endAt       DateTime?         @map("end_at")
+  startAt     DateTime           @map("start_at")
+  endAt       DateTime?          @map("end_at")
+  ugmSnapshot Decimal?           @map("ugm_snapshot") @db.Decimal(10, 4)
   notes       String?
-  createdAt   DateTime          @default(now()) @map("created_at")
-  updatedAt   DateTime          @updatedAt @map("updated_at")
-  deletedAt   DateTime?         @map("deleted_at")
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
+  deletedAt   DateTime?          @map("deleted_at")
 
   farm      Farm      @relation(fields: [farmId], references: [id], onDelete: Cascade)
   herdGroup HerdGroup @relation(fields: [herdGroupId], references: [id], onDelete: Cascade)
@@ -165,5 +171,6 @@ model GrazingEvent {
   @@index([herdGroupId], map: "grazing_events_herd_idx")
   @@index([paddockId], map: "grazing_events_paddock_idx")
   @@index([startAt], map: "grazing_events_start_at_idx")
+  @@index([status], map: "grazing_events_status_idx")
   @@map("grazing_events")
 }
